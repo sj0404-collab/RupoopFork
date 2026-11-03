@@ -37,6 +37,9 @@ android {
     buildFeatures {
         buildConfig = true
     }
+    defaultConfig {
+        buildConfigField("String", "PROXY_URL", "\"${localProperties.getProperty("PROXY_URL") ?: ""}\"")
+    }
     lint {
         checkReleaseBuilds = false
     }

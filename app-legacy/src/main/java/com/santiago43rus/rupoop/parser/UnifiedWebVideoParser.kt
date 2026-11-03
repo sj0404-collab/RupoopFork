@@ -77,7 +77,7 @@ object UnifiedWebVideoParser {
                 return@withContext null
             }
 
-            val rawHtml = response.body.string()
+            val rawHtml = response.body?.string() ?: ""
             val html = JsPackerUnpacker.unpack(rawHtml)
             val hostName = getHost(normalizedUrl) ?: "Фильм / Видео"
 
@@ -276,7 +276,7 @@ object UnifiedWebVideoParser {
 
             val response = httpClient.newCall(request).execute()
             if (!response.isSuccessful) return@withContext null
-            val rawHtml = response.body.string()
+            val rawHtml = response.body?.string() ?: ""
             val html = JsPackerUnpacker.unpack(rawHtml)
 
             // 1. Direct stream in player HTML
@@ -628,7 +628,7 @@ object UnifiedWebVideoParser {
 
             val response = httpClient.newCall(request).execute()
             if (!response.isSuccessful) return null
-            val html = response.body.string()
+            val html = response.body?.string() ?: ""
 
             val stream = extractAniboomStream(html, iframeUrl)
                 ?: extractStreamFromPlayerHtml(html, iframeUrl)
@@ -670,7 +670,7 @@ object UnifiedWebVideoParser {
 
             val response = httpClient.newCall(request).execute()
             if (!response.isSuccessful) return null
-            val html = response.body.string()
+            val html = response.body?.string() ?: ""
             val unpacked = JsPackerUnpacker.unpack(html)
 
             // Try direct extraction from Kodik HTML

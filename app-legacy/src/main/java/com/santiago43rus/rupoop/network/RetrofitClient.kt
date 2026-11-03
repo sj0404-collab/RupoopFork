@@ -5,7 +5,7 @@ import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
-import com.santiago43rus.rupoop.BuildConfig
+import com.santiago43rus.rupoop.legacy.BuildConfig
 
 object RetrofitClient {
     val json = Json {
