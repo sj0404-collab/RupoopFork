@@ -19,12 +19,12 @@ base {
 
 android {
     namespace = "com.santiago43rus.rupoop"
-    compileSdk = 37
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.santiago43rus.rupoop"
-        minSdk = 28
-        targetSdk = 37
+        minSdk = 21
+        targetSdk = 25
         versionCode = 9
         versionName = "1.1.1"
 
@@ -71,6 +71,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = true
     }
     buildFeatures {
         compose = true
@@ -133,6 +134,8 @@ dependencies {
     implementation(libs.zxing.core)
 
     implementation(libs.androidx.media3.transformer)
+
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

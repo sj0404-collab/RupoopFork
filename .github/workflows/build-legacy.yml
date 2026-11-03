@@ -1,0 +1,92 @@
+name: Build Legacy APK (Android 5-7, API 21-25)
+
+on:
+  push:
+    branches: [ legacy-android5-7 ]
+    tags: [ 'legacy-v*' ]
+  workflow_dispatch:
+
+jobs:
+  build-legacy:
+    runs-on: ubuntu-latest   # раннер с 7 ГБ ОЗУ, 4 ядра
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Create local.properties
+        env:
+          GH_CLIENT_ID: ${{ secrets.GH_CLIENT_ID }}
+          PROXY_URL: ${{ secrets.PROXY_URL }}
+          DONATE_URL: ${{ secrets.DONATE_URL }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          echo "GH_CLIENT_ID=$GH_CLIENT_ID" >> local.properties
+          echo "PROXY_URL=$PROXY_URL" >> local.properties
+          echo "DONATE_URL=$DONATE_URL" >> local.properties
+          echo "KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD" >> local.properties
+          echo "KEY_ALIAS=$KEY_ALIAS" >> local.properties
+          echo "KEY_PASSWORD=$KEY_PASSWORD" >> local.properties
+
+      - name: Decode keystore (for release builds)
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 --decode > app/keystore.jks
+          fi
+
+      - name: Build Legacy Debug APK
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Build Legacy Release APK (on tag or if keystore present)
+        run: ./gradlew assembleRelease --no-daemon
+
+      - name: Upload Legacy Debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Rupoop-legacy-debug-api21
+          path: app/build/outputs/apk/debug/*.apk
+          retention-days: 30
+
+      - name: Upload Legacy Release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Rupoop-legacy-release-api21
+          path: app/build/outputs/apk/release/*.apk
+          retention-days: 90
+
+  release:
+    needs: build-legacy
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/legacy-v')
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download Release APK
+        uses: actions/download-artifact@v4
+        with:
+          name: Rupoop-legacy-release-api21
+          path: dist
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.apk
+          generate_release_notes: true
+          body: |
+            Legacy-сборка Rupoop для старых планшетов: **Android 5.0–7.x (API 21–25)**.
+            Без PiP (нужен Android 8+), с coreLibraryDesugaring.
