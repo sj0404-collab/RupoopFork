@@ -703,7 +703,7 @@ object UnifiedWebVideoParser {
 
                     val gviResp = httpClient.newCall(gviReq).execute()
                     if (gviResp.isSuccessful) {
-                        val gviBody = gviResp.body.string()
+                        val gviBody = gviResp.body?.string() ?: ""
                         val gviJson = JSONObject(gviBody)
                         val links = gviJson.optJSONObject("links")
                         if (links != null) {
@@ -958,7 +958,7 @@ object UnifiedWebVideoParser {
 
             val playlistResp = httpClient.newCall(playlistReq).execute()
             if (!playlistResp.isSuccessful) return@withContext null
-            val playlistJsonStr = playlistResp.body.string()
+            val playlistJsonStr = playlistResp.body?.string() ?: ""
 
             val titleName = extractRegex(playlistJsonStr, """"titleName"\s*:\s*"([^"]+)"""")?.let { unescapeHtml(it) } ?: fallbackTitle
             
@@ -1031,7 +1031,7 @@ object UnifiedWebVideoParser {
 
             val videoResp = httpClient.newCall(videoReq).execute()
             if (!videoResp.isSuccessful) return@withContext null
-            val videoJsonStr = videoResp.body.string()
+            val videoJsonStr = videoResp.body?.string() ?: ""
 
             val thumbUrl = extractRegex(videoJsonStr, """"thumbUrl"\s*:\s*"([^"]+)"""")?.replace("\\/", "/") ?: fallbackThumbnail
             val duration = extractRegex(videoJsonStr, """"duration"\s*:\s*([0-9]+)""")?.toLongOrNull()
