@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Legacy (API 21-25): androidx.tvArtefacts требуют minSdk 23, но TV-UI на планшетах не используется -->
-    <uses-sdk tools:overrideLibrary="androidx.tv.foundation, androidx.tv.material, androidx.compose.animation, androidx.compose.ui, androidx.compose.foundation, androidx.compose.runtime, androidx.compose.material, androidx.compose.material3" />
+    <uses-sdk tools:overrideLibrary="androidx.tv.foundation, androidx.tv.material, androidx.compose.animation, androidx.compose.animation.animationcore, androidx.compose.ui, androidx.compose.ui.ui, androidx.compose.foundation, androidx.compose.foundation.foundation, androidx.compose.runtime, androidx.compose.runtime.runtime, androidx.compose.material, androidx.compose.material3, androidx.compose.material3.material3" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
