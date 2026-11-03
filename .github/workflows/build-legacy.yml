@@ -51,8 +51,13 @@ jobs:
       - name: Build Legacy Debug APK
         run: ./gradlew assembleDebug --no-daemon
 
-      - name: Build Legacy Release APK (on tag or if keystore present)
-        run: ./gradlew assembleRelease --no-daemon
+      - name: Build Legacy Release APK (only if keystore secret is set)
+        run: |
+          if [ -f app/keystore.jks ]; then
+            ./gradlew assembleRelease --no-daemon
+          else
+            echo "KEYSTORE_BASE64 not set - skipping release build"
+          fi
 
       - name: Upload Legacy Debug APK
         uses: actions/upload-artifact@v4
@@ -62,9 +67,10 @@ jobs:
           retention-days: 30
 
       - name: Upload Legacy Release APK
+        if: ${{ hashFiles('app/build/outputs/apk/release/*.apk') != '' }}
         uses: actions/upload-artifact@v4
         with:
-          name: Rupoop-legacy-release-api21
+          name: Rupoop-legacy-release
           path: app/build/outputs/apk/release/*.apk
           retention-days: 90
 
@@ -77,15 +83,18 @@ jobs:
 
     steps:
       - name: Download Release APK
+        continue-on-error: true
         uses: actions/download-artifact@v4
         with:
-          name: Rupoop-legacy-release-api21
+          name: Rupoop-legacy-release
           path: dist
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/*.apk
+          files: |
+            dist/*.apk
+            app/build/outputs/apk/debug/*.apk
           generate_release_notes: true
           body: |
             Legacy-сборка Rupoop для старых планшетов: **Android 5.0–7.x (API 21–25)**.
