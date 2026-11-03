@@ -70,8 +70,7 @@ class PlayerActivity : AppCompatActivity() {
         for (i in 0 until videoGroup.length) {
             val format = videoGroup.getTrackFormat(i)
             labels.add("${format.height}p")
-            val indices = intArrayOf(i)
-            overrides.add(TrackSelectionOverride(videoGroup.mediaTrackGroup, indices))
+            overrides.add(TrackSelectionOverride(videoGroup.mediaTrackGroup, listOf(i)))
         }
         androidx.appcompat.app.AlertDialog.Builder(this)
             .setTitle("Качество видео")
