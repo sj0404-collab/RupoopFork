@@ -68,7 +68,7 @@ class PlayerActivity : AppCompatActivity() {
         val overrides = mutableListOf<TrackSelectionOverride?>()
         overrides.add(null)
         for (i in 0 until videoGroup.length) {
-            val format = videoGroup.getFormat(i)
+            val format = videoGroup.getTrackFormat(i)
             labels.add("${format.height}p")
             val indices = intArrayOf(i)
             overrides.add(TrackSelectionOverride(videoGroup.mediaTrackGroup, indices))
