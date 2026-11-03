@@ -65,4 +65,5 @@ dependencies {
     implementation(libs.androidx.media3.exoplayer.hls)
 
     implementation("io.coil-kt:coil:2.7.0")
+    implementation(libs.zxing.core)
 }
