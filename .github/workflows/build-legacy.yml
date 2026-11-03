@@ -55,11 +55,10 @@ jobs:
         run: |
           if [ -f app/keystore.jks ]; then
             ./gradlew :app:assembleRelease --no-daemon
+          else
+            echo "KEYSTORE_BASE64 not set - skipping app release build"
           fi
           ./gradlew :app-legacy:assembleRelease --no-daemon
-          else
-            echo "KEYSTORE_BASE64 not set - skipping release build"
-          fi
 
       - name: Upload Legacy Debug APK
         uses: actions/upload-artifact@v4
@@ -69,7 +68,7 @@ jobs:
           retention-days: 30
 
       - name: Upload Legacy Release APK
-        if: ${{ hashFiles('app/build/outputs/apk/release/*.apk') != '' }}
+        if: ${{ hashFiles('app/build/outputs/apk/release/*.apk', 'app-legacy/build/outputs/apk/release/*.apk') != '' }}
         uses: actions/upload-artifact@v4
         with:
           name: Rupoop-legacy-release
