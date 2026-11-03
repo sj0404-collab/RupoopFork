@@ -52,7 +52,7 @@ class PlayerActivity : AppCompatActivity() {
                 return@launch
             }
             streamUrl = parsed.streamUrl
-            HistoryStore.add(this@PlayerActivity, url, parsed.title, parsed.authorName ?: "")
+            HistoryStore.add(this@PlayerActivity, url, parsed.title, parsed.authorName ?: "", intent.getStringExtra(EXTRA_SOURCE) ?: "Rutube")
             player?.setMediaItem(MediaItem.fromUri(Uri.parse(parsed.streamUrl)))
             player?.prepare()
             player?.playWhenReady = true
@@ -97,7 +97,8 @@ class PlayerActivity : AppCompatActivity() {
     companion object {
         private const val EXTRA_URL = "extra_url"
         private const val EXTRA_TITLE = "extra_title"
-        fun intent(ctx: Context, url: String, title: String) =
-            Intent(ctx, PlayerActivity::class.java).putExtra(EXTRA_URL, url).putExtra(EXTRA_TITLE, title)
+        private const val EXTRA_SOURCE = "extra_source"
+        fun intent(ctx: Context, url: String, title: String, source: String = "Rutube") =
+            Intent(ctx, PlayerActivity::class.java).putExtra(EXTRA_URL, url).putExtra(EXTRA_TITLE, title).putExtra(EXTRA_SOURCE, source)
     }
 }

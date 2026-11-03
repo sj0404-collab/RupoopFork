@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         adapter = VideoAdapter(
-            onClick = { video -> startActivity(PlayerActivity.intent(this, video.videoUrl, video.title)) },
+            onClick = { video -> startActivity(PlayerActivity.intent(this, video.videoUrl, video.title, currentSource())) },
             onLongClick = { video -> Downloader.download(this, lifecycleScope, video.videoUrl, video.title) }
         )
         recycler.layoutManager = LinearLayoutManager(this)
@@ -82,13 +82,13 @@ class MainActivity : AppCompatActivity() {
         this.doSearch = ::doSearch
 
         findViewById<View>(R.id.searchButton).setOnClickListener { doSearch(searchInput.text.toString().trim()) }
+        findViewById<View>(R.id.historyButton).setOnClickListener { startActivity(android.content.Intent(this, HistoryActivity::class.java)) }
         doSearch("")
     }
 
     private lateinit var doSearch: (String) -> Unit
 
-    override fun onResume() {
-        super.onResume()
-        if (::doSearch.isInitialized) doSearch("")
-    }
+    private fun currentSource(): String = engines[findViewById<Spinner>(R.id.platformSpinner).selectedItemPosition].first
+
+
 }
