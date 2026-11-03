@@ -23,7 +23,7 @@ android {
 
     defaultConfig {
         applicationId = "com.santiago43rus.rupoop"
-        minSdk = 21
+        minSdk = 23
         targetSdk = 25
         versionCode = 9
         versionName = "1.1.1"
