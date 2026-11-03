@@ -9,9 +9,13 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.media3.common.C
 import androidx.media3.common.MediaItem
+import androidx.media3.common.TrackSelectionOverride
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.ui.PlayerView
+import androidx.media3.ui.TrackSelectionDialog
 import com.santiago43rus.rupoop.parser.UniversalVideoParser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -21,6 +25,7 @@ class PlayerActivity : AppCompatActivity() {
 
     private var player: ExoPlayer? = null
     private lateinit var progress: ProgressBar
+    private var streamUrl: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,10 +35,16 @@ class PlayerActivity : AppCompatActivity() {
         progress = findViewById(R.id.progress)
         title = intent.getStringExtra(EXTRA_TITLE)
 
-        player = ExoPlayer.Builder(this).build()
+        val selector = DefaultTrackSelector(this)
+        player = ExoPlayer.Builder(this).setTrackSelector(selector).build()
         playerView.player = player
 
+        // Кнопка выбора качества дорожки (HLS-варианты)
+        playerView.setControllerVisibilityListener { _ -> }
+        findViewById<View>(R.id.qualityButton).setOnClickListener { showQualityDialog() }
+
         val url = intent.getStringExtra(EXTRA_URL) ?: ""
+        val videoTitle = intent.getStringExtra(EXTRA_TITLE) ?: ""
         progress.visibility = View.VISIBLE
         lifecycleScope.launch {
             val parsed = withContext(Dispatchers.IO) { UniversalVideoParser.parse(url) }
@@ -43,10 +54,21 @@ class PlayerActivity : AppCompatActivity() {
                 finish()
                 return@launch
             }
+            streamUrl = parsed.streamUrl
+            HistoryStore.add(this@PlayerActivity, url, parsed.title, parsed.authorName ?: "")
             player?.setMediaItem(MediaItem.fromUri(Uri.parse(parsed.streamUrl)))
             player?.prepare()
             player?.playWhenReady = true
         }
+    }
+
+    private fun showQualityDialog() {
+        val p = player ?: return
+        val mapped = p.currentTracks.groups
+        if (mapped.isEmpty()) return
+        TrackSelectionDialog.Builder(this, { _ -> }, p.currentTracks)
+            .setTrackSelectionParameters(p.trackSelectionParameters)
+            .build().show()
     }
 
     override fun onDestroy() {

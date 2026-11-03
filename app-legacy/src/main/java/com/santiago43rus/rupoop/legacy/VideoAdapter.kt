@@ -9,8 +9,10 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.santiago43rus.rupoop.data.SearchResult
 
-class VideoAdapter(private val onClick: (SearchResult) -> Unit) :
-    RecyclerView.Adapter<VideoAdapter.VH>() {
+class VideoAdapter(
+    private val onClick: (SearchResult) -> Unit,
+    private val onLongClick: (SearchResult) -> Unit
+) : RecyclerView.Adapter<VideoAdapter.VH>() {
 
     private val items = mutableListOf<SearchResult>()
 
@@ -31,6 +33,7 @@ class VideoAdapter(private val onClick: (SearchResult) -> Unit) :
         holder.author.text = item.author?.name ?: ""
         item.thumbnailUrl?.let { holder.thumb.load(it) }
         holder.itemView.setOnClickListener { onClick(item) }
+        holder.itemView.setOnLongClickListener { onLongClick(item); true }
     }
 
     override fun getItemCount() = items.size
