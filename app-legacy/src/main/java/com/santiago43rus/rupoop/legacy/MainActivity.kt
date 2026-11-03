@@ -71,7 +71,7 @@ class MainActivity : AppCompatActivity() {
                 sectionTitle.text = if (q.isBlank()) "История просмотров" else "Результаты: ${results.size}"
                 if (q.isBlank()) {
                     adapter.submit(HistoryStore.list(this@MainActivity).map {
-                        SearchResult(videoUrl = it.url, title = it.title, author = com.santiago43rus.rupoop.data.Author(it.author))
+                        SearchResult(videoUrl = it.url, title = it.title, author = com.santiago43rus.rupoop.data.Author(name = it.author))
                     })
                 } else {
                     if (results.isEmpty()) Toast.makeText(this@MainActivity, "Ничего не найдено", Toast.LENGTH_SHORT).show()

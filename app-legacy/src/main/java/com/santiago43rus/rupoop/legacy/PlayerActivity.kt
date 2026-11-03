@@ -15,7 +15,6 @@ import androidx.media3.common.TrackSelectionOverride
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.ui.PlayerView
-import androidx.media3.ui.TrackSelectionDialog
 import com.santiago43rus.rupoop.parser.UniversalVideoParser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -39,8 +38,6 @@ class PlayerActivity : AppCompatActivity() {
         player = ExoPlayer.Builder(this).setTrackSelector(selector).build()
         playerView.player = player
 
-        // Кнопка выбора качества дорожки (HLS-варианты)
-        playerView.setControllerVisibilityListener { _ -> }
         findViewById<View>(R.id.qualityButton).setOnClickListener { showQualityDialog() }
 
         val url = intent.getStringExtra(EXTRA_URL) ?: ""
@@ -64,11 +61,32 @@ class PlayerActivity : AppCompatActivity() {
 
     private fun showQualityDialog() {
         val p = player ?: return
-        val mapped = p.currentTracks.groups
-        if (mapped.isEmpty()) return
-        TrackSelectionDialog.Builder(this, { _ -> }, p.currentTracks)
-            .setTrackSelectionParameters(p.trackSelectionParameters)
-            .build().show()
+        val selector = p.trackSelector as? DefaultTrackSelector ?: return
+        val groups = p.currentTracks.groups
+        val videoGroup = groups.firstOrNull { it.type == C.TRACK_TYPE_VIDEO } ?: return
+        val labels = mutableListOf("Авто")
+        val overrides = mutableListOf<TrackSelectionOverride?>()
+        overrides.add(null)
+        for (i in 0 until videoGroup.length) {
+            val format = videoGroup.getFormat(i)
+            labels.add("${format.height}p")
+            val indices = intArrayOf(i)
+            overrides.add(TrackSelectionOverride(videoGroup.mediaTrackGroup, indices))
+        }
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Качество видео")
+            .setItems(labels.toTypedArray()) { _, which ->
+                val ov = overrides[which]
+                val params = if (ov == null) {
+                    p.trackSelectionParameters.buildUpon().clearOverrides().build()
+                } else {
+                    p.trackSelectionParameters.buildUpon()
+                        .setOverrideForType(ov)
+                        .build()
+                }
+                selector.setParameters(params)
+            }
+            .show()
     }
 
     override fun onDestroy() {
