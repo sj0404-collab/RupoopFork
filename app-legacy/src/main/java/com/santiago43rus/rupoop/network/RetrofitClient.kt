@@ -63,7 +63,7 @@ object RetrofitClient {
 
     val deviceAuthApi: DeviceAuthApi by lazy {
         Retrofit.Builder()
-            .baseUrl(BuildConfig.PROXY_URL)
+            .baseUrl(if (BuildConfig.PROXY_URL.isNotBlank()) BuildConfig.PROXY_URL else "https://rutube.ru/")
             .client(okHttpClient)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .build()
