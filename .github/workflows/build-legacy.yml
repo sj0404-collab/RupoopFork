@@ -49,12 +49,14 @@ jobs:
           fi
 
       - name: Build Legacy Debug APK
-        run: ./gradlew assembleDebug --no-daemon
+        run: ./gradlew :app-legacy:assembleDebug --no-daemon
 
       - name: Build Legacy Release APK (only if keystore secret is set)
         run: |
           if [ -f app/keystore.jks ]; then
-            ./gradlew assembleRelease --no-daemon
+            ./gradlew :app:assembleRelease --no-daemon
+          fi
+          ./gradlew :app-legacy:assembleRelease --no-daemon
           else
             echo "KEYSTORE_BASE64 not set - skipping release build"
           fi
@@ -62,8 +64,8 @@ jobs:
       - name: Upload Legacy Debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: Rupoop-legacy-debug-api21
-          path: app/build/outputs/apk/debug/*.apk
+          name: Rupoop-legacy-views-debug
+          path: app-legacy/build/outputs/apk/debug/*.apk
           retention-days: 30
 
       - name: Upload Legacy Release APK
@@ -71,7 +73,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Rupoop-legacy-release
-          path: app/build/outputs/apk/release/*.apk
+          path: |
+            app/build/outputs/apk/release/*.apk
+            app-legacy/build/outputs/apk/release/*.apk
           retention-days: 90
 
   release:

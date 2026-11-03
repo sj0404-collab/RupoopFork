@@ -24,3 +24,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Rupoop"
 include(":app")
+include(":app-legacy")
